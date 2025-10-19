@@ -7,7 +7,7 @@ typedef struct platform_state {
     void* internal_state;
 } platform_state;
 
-KAPI b8 platform_setup(
+b8 platform_setup(
     platform_state* plat_stat,
     const char* application_name,
     i32 x,
@@ -15,14 +15,14 @@ KAPI b8 platform_setup(
     i32 width,
     i32 height);
 
-KAPI void platform_shutdown(platform_state* plat_state);
+void platform_shutdown(platform_state* plat_state);
 
 // 处理平台消息队列，返回是否继续运行应用程序
-KAPI b8 platform_pump_messages(platform_state* plat_state);
+b8 platform_pump_messages(platform_state* plat_state);
 
 // 平台相关的内存操作函数接口
-void* platform_allocate(u64 size, b8 aligned);
-void platform_free(void* block, b8 aligned);
+KAPI void* platform_allocate(u64 size, b8 aligned);
+KAPI void platform_free(void* block, b8 aligned);
 void* platform_zero_memory(void* block, u64 size);
 void* platform_copy_memory(void* dest, const void* source, u64 size);
 void* platform_set_memory(void* dest, i32 value, u64 size);

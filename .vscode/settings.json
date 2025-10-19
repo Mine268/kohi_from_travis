@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "defines.h": "c"
+        "defines.h": "c",
+        "iosfwd": "c",
+        "xlocbuf": "c",
+        "application.h": "c",
+        "game_types.h": "c"
     }
 }
