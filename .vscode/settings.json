@@ -4,6 +4,7 @@
         "iosfwd": "c",
         "xlocbuf": "c",
         "application.h": "c",
-        "game_types.h": "c"
+        "game_types.h": "c",
+        "platform.h": "c"
     }
 }
