@@ -5,6 +5,7 @@
         "xlocbuf": "c",
         "application.h": "c",
         "game_types.h": "c",
-        "platform.h": "c"
+        "platform.h": "c",
+        "input.h": "c"
     }
 }

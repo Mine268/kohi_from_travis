@@ -18,6 +18,10 @@ typedef struct application_state {
     f64 last_time;
 } application_state;
 
+// 应用程序用于用来进行监听注册的接口
+b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context);
+b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context);
+
 // 单例
 static b8 initialized = FALSE;
 static application_state app_state;
@@ -49,6 +53,11 @@ b8 applicatoin_create(game* game_inst) {
         KERROR("Event system failed initialization. Application cannot continue.");
         return FALSE;
     }
+
+    // 注册监听的事件
+    event_register(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
+    event_register(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
+    event_register(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
 
     if (!platform_setup(
             &app_state.platform,
@@ -105,10 +114,51 @@ b8 application_run() {
 
     app_state.is_running = FALSE;
 
+    // 取消事件监听注册
+    event_unregister(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
+    event_unregister(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
+    event_unregister(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
+
     event_shutdown();
     input_shutdown();
 
     platform_shutdown(&app_state.platform);
 
     return TRUE;
+}
+
+b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
+    switch (code) {
+        case EVENT_CODE_APPLICATION_QUIT:
+            KINFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down!");
+            app_state.is_running = FALSE;
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context) {
+    if (code == EVENT_CODE_KEY_PRESSED) {
+        u16 key_code = context.data.u16[0]; // 从事件上下文获得按键
+        if (key_code == KEY_ESCAPE) {
+            // 触发退出事件，由on_event接收处理
+            event_context data = {};
+            event_fire(EVENT_CODE_APPLICATION_QUIT, 0, data);
+            return TRUE; // 返回TRUE，之后的监听链不会继续处理这个事件，被消耗掉了
+        } else if (key_code == KEY_A) {
+            KDEBUG("Explicit - A key pressed!");
+        } else {
+            KDEBUG("'%c' key pressed in window.", key_code);
+        }
+    } else if (code == EVENT_CODE_KEY_RELEASED) {
+        u16 key_code = context.data.u16[0]; // 从事件上下文获得按键
+        if (key_code == KEY_A) {
+            KDEBUG("Explicit - A key released!");
+        } else {
+            KDEBUG("'%c' key released in window.", key_code);
+        }
+    }
+
+    return FALSE;
 }
